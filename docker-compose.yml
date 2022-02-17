@@ -1,0 +1,41 @@
+version: '3.9'
+
+networks:
+  laravel:
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.dockerfile
+    ports:
+      - 8098:80
+    volumes:
+      - ./:/var/www/html
+    links:
+      - fpm
+    networks:
+      - laravel
+
+  fpm:
+    build:
+      context: .
+      dockerfile: docker/fpm.dockerfile
+    volumes:
+      - ./:/var/www/html
+    links:
+      - db
+    networks:
+      - laravel
+
+  db:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=ok
+      - MYSQL_DATABASE=laravel
+    networks:
+      - laravel
